@@ -89,13 +89,6 @@
                     <a href="https://forge.laravel.com">Forge</a>
                     <a href="https://github.com/laravel/laravel">GitHub</a>
 
-                    @if($bob==false)
-                        hi this is bob
-                        
-                        @foreach($services as $ser)
-                            {{$ser}}
-                        @endforeach
-                    @endif
                 </div>
             </div>
         </div>
