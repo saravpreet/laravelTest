@@ -1,0 +1,5 @@
+.env
+composer.phar
+artisan
+vendor/*
+node_modules/*
