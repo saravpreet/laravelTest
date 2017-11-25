@@ -95,16 +95,16 @@
                 },
                 created:  function () {
                             
-                            for (var i = 0; i < list.length; i++) {
+                            
+                        for (var i = 0; i < list.length; i++) {
                                 
                             
                             let priceJs=parseInt(list[i].innerText);
                                         
-                            if(this.gTotal!==undefined){
-                                    this.gTotal=this.gTotal+priceJs;
-                                }
+                                this.gTotal=this.gTotal+priceJs;
                             }
-                                    document.querySelector('#gTotal').value=this.gTotal;
+                            
+                            document.querySelector('#gTotal').value=this.gTotal;
                     
                 },
                 methods: {
@@ -128,14 +128,14 @@
                                     
                                     document.querySelector('#tbody').innerHTML=response2.data;
                                     
-                                    if(this.gTotal!==undefined){
+                                    var list = document.querySelectorAll('#tbody tr td:last-child');
                                         this.gTotal=0;
                                         for (var i = 0; i < list.length; i++) {
                                             let priceJs=parseInt(list[i].innerText);
                                             this.gTotal=parseInt(this.gTotal)+priceJs;
                                         }
                                         document.querySelector('#gTotal').value=this.gTotal;
-                                    }
+                                    
                                 })
                                 .catch(function (error2) {
                                     console.log(error2);
