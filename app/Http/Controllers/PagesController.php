@@ -9,31 +9,50 @@ class PagesController extends Controller {
     //
     public function index() {
 
-        $raw      = array_filter(explode("\n",file_get_contents('store')));
-        
-        $products=[];
-        
-        foreach($raw as $row){
-            $product = json_decode($row,true);
-            $ts=key($product);
-            $dt=new \DateTime();
-            $dt->setTimestamp($ts);
-            $product[$ts]['dt']=$dt->format('m-d-Y g:ia');
-            $product[$ts]['total']=$product[$ts]['quanStock']*$product[$ts]['price'];
-            
-            $products[$ts]=$product[$ts];
-            
-            
-            
+        $isAjax = request()->query('isAjax');
+
+        $raw = array_filter(explode("\n", file_get_contents('store')));
+
+        $products = [];
+
+        foreach ($raw as $row) {
+            $jRow = json_decode($row, true);
+            $ts   = key($jRow);
+
+            list($sec) = explode('.', $ts);
+            $jRow[$ts]['dt']    = date('m-d-Y g:ia', $sec);
+            $jRow[$ts]['total'] = $jRow[$ts]['quanStock'] * $jRow[$ts]['price'];
+
+            $products[$ts] = $jRow[$ts];
         }
-        
-        ksort($products);
+
+
+        //ss: sorting using datetime
+        krsort($products);
 //        print_r($products);exit;
-        
+
         $data = [
-            'title'    => 'TEST',
+            'title'     => 'TEST',
             'jsonPData' => $products
         ];
+
+        if ($isAjax == 'ajax') {
+            $htmlOut = '';
+
+            foreach ($products as $row) {
+                $htmlOut .= "
+                            <tr>
+                                <td>{$row['pName']}</td>
+                                <td>{$row['quanStock']}</td>
+                                <td>{$row['price']}</td>
+                                <td>{$row['dt']}</td>
+                                <td>{$row['total']}</td>
+                            </tr>
+                            ";
+            }
+            echo $htmlOut;
+            exit;
+        }
 
         return view('home')->with($data);
     }
@@ -44,11 +63,25 @@ class PagesController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function create() {
-        $dt                            = new \DateTime();
-        $products[$dt->getTimestamp()] = $_POST['products'];
 
-        $json = json_encode($products) . "\n";
-        file_put_contents('store', $json, FILE_APPEND);
+        $dt     = new \DateTime();
+        $post   = request()->all();
+        $isAjax = ($post['isAjax'] == 'ajax') ? true : false;
+        $ts     = microtime(true);
+
+        unset($post['isAjax']);
+
+        if (!empty($post['pName'])) {
+            $products[$ts] = $post;
+
+            $json = json_encode($products) . "\n";
+            file_put_contents('store', $json, FILE_APPEND);
+        }
+
+        if ($isAjax == true) {
+            echo 'success';
+            exit;
+        }
         return redirect('/');
     }
 
